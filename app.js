@@ -3,6 +3,9 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const mongoose = require("mongoose");
+require("dotenv").config();
+const debug = require("debug")("http");
 
 var myFaveGamesRouter = require("./routes/my-fave-games");
 var faveGamesRouter = require("./routes/fave-games");
@@ -19,6 +22,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+mongoose.connect(process.env.ATLAS_URI, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+});
+
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
 app.use("/my-fave-games", myFaveGamesRouter);
 app.use("/fave-games", faveGamesRouter);
 
@@ -36,6 +48,12 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
+});
+
+const connection = mongoose.connection;
+
+connection.once("open", () => {
+  debug("MongoDB database connection established correctly");
 });
 
 module.exports = app;
