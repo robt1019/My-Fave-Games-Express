@@ -5,7 +5,11 @@ const axios = require("axios");
 router.get("/", function (req, res, next) {
   const platformIds = req.query.platformIds;
   if (!platformIds) {
-    res.status(400).send("You must provide platformIds");
+    res
+      .status(400)
+      .send(
+        "You must provide a comma separated list of platformIds in the query string"
+      );
   } else {
     axios({
       url: "https://api-v3.igdb.com/platforms",

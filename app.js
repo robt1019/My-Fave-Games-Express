@@ -6,6 +6,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const debug = require("debug")("http");
+const cors = require("cors");
 
 const gamesRouter = require("./routes/games");
 const platformsRouter = require("./routes/platforms");
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors());
 
 mongoose.connect(process.env.ATLAS_URI, {
   useNewUrlParser: true,

@@ -5,7 +5,9 @@ const axios = require("axios");
 router.get("/", function (req, res, next) {
   const searchTerm = req.query.search;
   if (!searchTerm) {
-    res.status(400).send("You must provide a search term");
+    res
+      .status(400)
+      .send("You must provide a search term via the search query string");
   } else {
     axios({
       url: "https://api-v3.igdb.com/games",
