@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const debug = require("debug")("http");
 
+const gamesRouter = require("./routes/games");
 var myFaveGamesRouter = require("./routes/my-fave-games");
 var faveGamesRouter = require("./routes/fave-games");
 
@@ -27,6 +28,7 @@ mongoose.connect(process.env.ATLAS_URI, {
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
+app.use("/games", gamesRouter);
 app.use("/my-fave-games", myFaveGamesRouter);
 app.use("/fave-games", faveGamesRouter);
 
