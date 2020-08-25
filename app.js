@@ -1,17 +1,18 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const debug = require("debug")("http");
 
 const gamesRouter = require("./routes/games");
-var myFaveGamesRouter = require("./routes/my-fave-games");
-var faveGamesRouter = require("./routes/fave-games");
+const platformsRouter = require("./routes/platforms");
+const myFaveGamesRouter = require("./routes/my-fave-games");
+const faveGamesRouter = require("./routes/fave-games");
 
-var app = express();
+const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -29,6 +30,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 app.use("/games", gamesRouter);
+app.use("/platforms", platformsRouter);
 app.use("/my-fave-games", myFaveGamesRouter);
 app.use("/fave-games", faveGamesRouter);
 
