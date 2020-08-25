@@ -6,7 +6,7 @@ const faveGames = [];
 const username = "robt1019";
 
 router.get("/", function (req, res, next) {
-  res.render("index", { title: "express" });
+  res.send("my-fave-games not implemented yet");
 });
 
 module.exports = router;
