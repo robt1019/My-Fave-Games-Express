@@ -14,7 +14,7 @@ router.get("/", function (req, res, next) {
         Accept: "application/json",
         "user-key": process.env.IGDB_USER_KEY,
       },
-      data: `fields name, platforms; search ${searchTerm}; limit 100;`,
+      data: `fields name, platforms; search "${searchTerm}"; limit 100;`,
     })
       .then((response) => {
         res.json(response.data);
