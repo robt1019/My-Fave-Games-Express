@@ -7,6 +7,20 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const debug = require("debug")("http");
 const cors = require("cors");
+const jwt = require("express-jwt");
+const jwks = require("jwks-rsa");
+
+var jwtCheck = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: process.env.JWKS_URI,
+  }),
+  audience: process.env.API_URL,
+  issuer: process.env.AUTH0_DOMAIN,
+  algorithms: ["RS256"],
+});
 
 const gamesRouter = require("./routes/games");
 const platformsRouter = require("./routes/platforms");
@@ -15,6 +29,7 @@ const faveGamesRouter = require("./routes/fave-games");
 
 const app = express();
 
+app.use(jwtCheck);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
