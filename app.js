@@ -10,7 +10,7 @@ const cors = require("cors");
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
 
-var jwtCheck = jwt({
+export const jwtCheck = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -29,7 +29,6 @@ const faveGamesRouter = require("./routes/fave-games");
 
 const app = express();
 
-app.use(jwtCheck);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
