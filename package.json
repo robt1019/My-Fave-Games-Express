@@ -9,6 +9,7 @@
     "start": "node ./bin/www",
     "deploy:dev": "git push development master",
     "deploy-force:dev": "git push development master -f",
+    "restart:dev": "heroku restart --remote=development",
     "logs:dev": "heroku logs --remote=development --tail"
   },
   "dependencies": {
