@@ -7,6 +7,10 @@ const faveGameSchema = new Schema({
     required: true,
     unique: true,
   },
+  userId: {
+    type: String,
+    required: true,
+  },
   gameId: {
     type: String,
     required: true,
@@ -14,9 +18,6 @@ const faveGameSchema = new Schema({
   platformId: {
     type: String,
     required: true,
-  },
-  reasons: {
-    type: String,
   },
 });
 
