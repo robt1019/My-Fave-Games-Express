@@ -4,8 +4,20 @@ const router = express.Router();
 const User = require("../models/user.model");
 const FaveGame = require("../models/fave-game.model");
 
-router.get("/", jwtCheck, function (req, res, next) {
-  res.send("my-fave-games not implemented yet");
+router.get("/:userId", jwtCheck, function (req, res, next) {
+  const userId = req.params.userId;
+  User.findOne({ userId }).then((result) => {
+    if (result) {
+      res.send(result.faveGames);
+    } else {
+      User.create({
+        userId,
+        faveGames: [],
+      }).then(() => {
+        res.send([]);
+      });
+    }
+  });
 });
 
 // create
