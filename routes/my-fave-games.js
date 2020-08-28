@@ -18,7 +18,6 @@ router.get("/:userId", function (req, res, next) {
     });
 });
 
-// create
 router.post("/", jwtCheck, (req, res) => {
   const { gameId, platformId } = req.body;
   const userId = req.user.sub;
@@ -61,9 +60,11 @@ router.post("/", jwtCheck, (req, res) => {
     .catch((err) => res.status(400).send(err));
 });
 
-//update
-router.put("/", jwtCheck, (req, res) => {
-  res.send("my-fave-games not implemented yet");
+router.delete("/:faveGameId", jwtCheck, (req, res) => {
+  const { faveGameId } = req.params;
+  FaveGame.findOneAndDelete({ id: faveGameId })
+    .then(() => res.status(200).send())
+    .catch((err) => res.status(400).send);
 });
 
 module.exports = router;
