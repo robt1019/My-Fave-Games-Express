@@ -11,7 +11,7 @@ const cors = require("cors");
 const gamesRouter = require("./routes/games");
 const platformsRouter = require("./routes/platforms");
 const myFaveGamesRouter = require("./routes/my-fave-games");
-const faveGamesRouter = require("./routes/fave-games");
+const platformFaveGamesRouter = require("./routes/platform-fave-games");
 
 const app = express();
 
@@ -34,7 +34,7 @@ app.get("/ping", (req, res) => {
 app.use("/games", gamesRouter);
 app.use("/platforms", platformsRouter);
 app.use("/my-fave-games", myFaveGamesRouter);
-app.use("/fave-games", faveGamesRouter);
+app.use("/platform-fave-games", platformFaveGamesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
