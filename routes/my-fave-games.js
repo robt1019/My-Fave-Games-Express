@@ -63,14 +63,12 @@ router.post("/", jwtCheck, (req, res) => {
 router.delete("/:faveGameId", jwtCheck, (req, res) => {
   const { faveGameId } = req.params;
   const userId = faveGameId.split("-")[2];
-  User.findOne({ userId })
-    .populate("faveGames")
-    .then((user) => {
-      user.faveGames = user.faveGames.filter(
-        (faveGame) => faveGame.id !== faveGameId
-      );
-      user.save();
-    });
+  User.findOne({ userId }).then((user) => {
+    user.faveGames = user.faveGames.filter(
+      (faveGame) => faveGame.id !== faveGameId
+    );
+    user.save();
+  });
   FaveGame.findOneAndDelete({ id: faveGameId })
     .then(() => res.status(200).send())
     .catch((error) => res.status(400).send(error));
