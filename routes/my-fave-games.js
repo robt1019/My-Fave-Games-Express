@@ -38,7 +38,7 @@ router.get("/:userId", function (req, res) {
 });
 
 router.post("/", jwtCheck, (req, res) => {
-  const { gameId, platformId } = req.body;
+  const { gameId, platformId, reasons } = req.body;
   const userId = sha256(req.user.sub);
 
   debug(
@@ -52,6 +52,7 @@ router.post("/", jwtCheck, (req, res) => {
     platformId,
     gameId,
     userId,
+    reasons,
   });
 
   newGame

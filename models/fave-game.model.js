@@ -19,6 +19,10 @@ const faveGameSchema = new Schema({
     type: String,
     required: true,
   },
+  reasons: {
+    type: String,
+    required: false,
+  },
 });
 
 const FaveGame = mongoose.model("FaveGame", faveGameSchema);

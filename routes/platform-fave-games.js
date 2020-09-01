@@ -19,10 +19,14 @@ router.get("/:platformId", function (req, res) {
       }, {});
       res.status(200).send(
         Object.keys(platformFaveGamesByGameId)
-          .map((gameId) => ({
-            gameId,
-            count: platformFaveGamesByGameId[gameId].length,
-          }))
+          .map((gameId) => {
+            const faveGame = platformFaveGamesByGameId[gameId];
+            return {
+              gameId,
+              count: faveGame.length,
+              reasons: faveGame.map((userFave) => userFave.reasons),
+            };
+          })
           .sort((a, b) => {
             if (a.count > b.count) {
               return -1;
