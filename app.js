@@ -10,6 +10,7 @@ const cors = require("cors");
 
 const gamesRouter = require("./routes/games");
 const platformsRouter = require("./routes/platforms");
+const usersRouter = require("./routes/users");
 const myFaveGamesRouter = require("./routes/my-fave-games");
 const platformFaveGamesRouter = require("./routes/platform-fave-games");
 
@@ -33,6 +34,7 @@ app.get("/ping", (req, res) => {
 });
 app.use("/games", gamesRouter);
 app.use("/platforms", platformsRouter);
+app.use("/users", usersRouter);
 app.use("/my-fave-games", myFaveGamesRouter);
 app.use("/platform-fave-games", platformFaveGamesRouter);
 
