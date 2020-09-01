@@ -37,22 +37,22 @@ router.post("/", jwtCheck, (req, res) => {
 
   newGame
     .save()
-    .then((game) => {
+    .then(() => {
       User.findOne({ userId }).then((result) => {
         if (result) {
-          result.faveGames.push(game);
+          result.faveGames.push(newGame);
           result
             .save()
-            .then((obj) => {
-              res.status(200).send(obj);
+            .then(() => {
+              res.status(200).send(newGame);
             })
             .catch((err) => res.status(400).send(err));
         } else {
           User.create({
             userId,
-            faveGames: [game],
+            faveGames: [newGame],
           })
-            .then((result) => res.status(200).send(result))
+            .then(() => res.status(200).send(newGame))
             .catch((err) => res.status(400).send(err));
         }
       });
