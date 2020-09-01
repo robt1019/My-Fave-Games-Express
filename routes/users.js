@@ -11,9 +11,8 @@ router.get("/", function (req, res) {
       .send("You must provide a search term via the search query string");
   } else {
     debug(`search term: ${searchTerm}`);
-    const reggiex = new RegExp(searchTerm, "i");
-    debug(`regex: ${reggiex}`);
-    User.find({ userId: reggiex })
+    const searchTermRegex = new RegExp(searchTerm, "i");
+    User.find({ $or: [{ userId: searchTermRegex }, { name: searchTermRegex }] })
       .then((users) => {
         debug(`users found: ${users}`);
         res.status(200).send(users);

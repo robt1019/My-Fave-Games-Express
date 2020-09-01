@@ -8,6 +8,12 @@ const userSchema = new Schema({
     unique: true,
     trim: true,
   },
+  name: {
+    type: String,
+    required: false,
+    unique: false,
+    trim: true,
+  },
   faveGames: [
     {
       type: mongoose.ObjectId,

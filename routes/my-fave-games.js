@@ -4,8 +4,27 @@ const { jwtCheck } = require("../services/jwt-check.service");
 const router = express.Router();
 const User = require("../models/user.model");
 const FaveGame = require("../models/fave-game.model");
+const axios = require("axios");
+const crypto = require("crypto");
 
-router.get("/:userId", function (req, res, next) {
+function sha256(buffer) {
+  return crypto.createHash("sha256").update(buffer, "utf8").digest("hex");
+}
+
+router.get("/", jwtCheck, function (req, res) {
+  const userId = sha256(req.user.sub);
+  User.findOne({ userId })
+    .populate("faveGames")
+    .then((result) => {
+      if (result) {
+        res.send(result.faveGames);
+      } else {
+        res.send([]);
+      }
+    });
+});
+
+router.get("/:userId", function (req, res) {
   const userId = req.params.userId;
   User.findOne({ userId })
     .populate("faveGames")
@@ -20,7 +39,7 @@ router.get("/:userId", function (req, res, next) {
 
 router.post("/", jwtCheck, (req, res) => {
   const { gameId, platformId } = req.body;
-  const userId = req.user.sub;
+  const userId = sha256(req.user.sub);
 
   debug(
     `creating new game with body: ${JSON.stringify(
@@ -48,12 +67,21 @@ router.post("/", jwtCheck, (req, res) => {
             })
             .catch((err) => res.status(400).send(err));
         } else {
-          User.create({
-            userId,
-            faveGames: [newGame],
-          })
-            .then(() => res.status(200).send(newGame))
-            .catch((err) => res.status(400).send(err));
+          axios({
+            url: `${process.env.AUTH0_DOMAIN}userInfo`,
+            method: "GET",
+            headers: {
+              Authorization: req.header("Authorization"),
+            },
+          }).then((userInfo) => {
+            User.create({
+              userId,
+              name: (userInfo.data && userInfo.data.name) || "",
+              faveGames: [newGame],
+            })
+              .then(() => res.status(200).send(newGame))
+              .catch((err) => res.status(400).send(err));
+          });
         }
       });
     })
