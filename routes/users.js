@@ -9,16 +9,11 @@ router.get("/", function (req, res) {
       .status(400)
       .send("You must provide a search term via the search query string");
   } else {
-    User.find({}).then((users) => {
-      res
-        .status(200)
-        .send(
-          users.filter(
-            (u) =>
-              u.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-          )
-        );
-    });
+    User.find({ userId: new RegExp("^" + searchTerm + "$", "i") }).then(
+      (users) => {
+        res.status(200).send(users);
+      }
+    );
   }
 });
 
