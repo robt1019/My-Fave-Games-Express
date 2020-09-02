@@ -29,7 +29,7 @@ mongoose.connect(process.env.ATLAS_URI, {
   useUnifiedTopology: true,
 });
 
-app.get("/ping", (req, res) => {
+app.get("/ping", (_, res) => {
   res.send("pong");
 });
 app.use("/games", gamesRouter);

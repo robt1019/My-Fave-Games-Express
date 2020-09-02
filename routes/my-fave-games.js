@@ -72,7 +72,6 @@ router.post("/", jwtCheck, (req, res) => {
 
 router.delete("/:faveGameId", jwtCheck, (req, res) => {
   const { faveGameId } = req.params;
-  const userId = faveGameId.split("-")[2];
   FaveGame.findOneAndDelete({ id: faveGameId })
     .then(() => res.status(200).send())
     .catch((error) => res.status(400).send(error));

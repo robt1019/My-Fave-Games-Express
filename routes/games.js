@@ -13,15 +13,36 @@ router.get("/:gameId", (req, res) => {
     },
     data: `fields name, platforms; where id = ${gameId}; limit 100;`,
   })
-    .then((response) => {
-      res.json(response.data[0]);
+    .then((game) => {
+      axios({
+        url: "https://api-v3.igdb.com/screenshots",
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "user-key": process.env.IGDB_USER_KEY,
+        },
+        data: `fields id, url; where game = ${gameId}; limit 100;`,
+      })
+        .then((screenshots) => {
+          res.json({
+            ...game.data[0],
+            screenshots: screenshots.data.map((screenshot) => ({
+              ...screenshot,
+              url: `https:${screenshot.url.replace(
+                "t_thumb",
+                "t_screenshot_big"
+              )}`,
+            })),
+          });
+        })
+        .catch((err) => res.status(400).send(err));
     })
     .catch((err) => {
       res.status(400).send(err);
     });
 });
 
-router.get("/", function (req, res, next) {
+router.get("/", function (req, res) {
   const searchTerm = req.query.search;
   if (!searchTerm) {
     res
