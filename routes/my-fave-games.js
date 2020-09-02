@@ -13,28 +13,16 @@ function sha256(buffer) {
 
 router.get("/", jwtCheck, function (req, res) {
   const userId = sha256(req.user.sub);
-  User.findOne({ userId })
-    .populate("faveGames")
-    .then((result) => {
-      if (result) {
-        res.send(result.faveGames);
-      } else {
-        res.send([]);
-      }
-    });
+  FaveGame.find({ userId }).then((results) => {
+    res.send(results);
+  });
 });
 
 router.get("/:userId", function (req, res) {
   const userId = req.params.userId;
-  User.findOne({ userId })
-    .populate("faveGames")
-    .then((result) => {
-      if (result) {
-        res.send(result.faveGames);
-      } else {
-        res.send([]);
-      }
-    });
+  FaveGame.find({ userId }).then((results) => {
+    res.send(results);
+  });
 });
 
 router.post("/", jwtCheck, (req, res) => {
@@ -60,13 +48,7 @@ router.post("/", jwtCheck, (req, res) => {
     .then(() => {
       User.findOne({ userId }).then((result) => {
         if (result) {
-          result.faveGames.push(newGame);
-          result
-            .save()
-            .then(() => {
-              res.status(200).send(newGame);
-            })
-            .catch((err) => res.status(400).send(err));
+          res.status(200).send(newGame);
         } else {
           axios({
             url: `${process.env.AUTH0_DOMAIN}userInfo`,
@@ -78,7 +60,6 @@ router.post("/", jwtCheck, (req, res) => {
             User.create({
               userId,
               name: (userInfo.data && userInfo.data.name) || "",
-              faveGames: [newGame],
             })
               .then(() => res.status(200).send(newGame))
               .catch((err) => res.status(400).send(err));
@@ -92,12 +73,6 @@ router.post("/", jwtCheck, (req, res) => {
 router.delete("/:faveGameId", jwtCheck, (req, res) => {
   const { faveGameId } = req.params;
   const userId = faveGameId.split("-")[2];
-  User.findOne({ userId }).then((user) => {
-    user.faveGames = user.faveGames.filter(
-      (faveGame) => faveGame.id !== faveGameId
-    );
-    user.save();
-  });
   FaveGame.findOneAndDelete({ id: faveGameId })
     .then(() => res.status(200).send())
     .catch((error) => res.status(400).send(error));

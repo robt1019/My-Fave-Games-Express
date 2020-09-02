@@ -14,12 +14,6 @@ const userSchema = new Schema({
     unique: false,
     trim: true,
   },
-  faveGames: [
-    {
-      type: mongoose.ObjectId,
-      ref: "FaveGame",
-    },
-  ],
 });
 
 const User = mongoose.model("User", userSchema);
