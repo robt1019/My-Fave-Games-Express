@@ -73,6 +73,8 @@ router.post("/", jwtCheck, (req, res) => {
 router.put("/:faveGameId", jwtCheck, (req, res) => {
   const { faveGameId } = req.params;
   const { reasons } = req.body;
+  debug(`updating game: ${faveGameId}`);
+  debug(`new reasons: ${reasons}`);
   FaveGame.findOneAndUpdate({ id: faveGameId }, { reasons })
     .then((updatedGame) => res.status(200).send(updatedGame))
     .catch((err) => res.status(400).send(err));
