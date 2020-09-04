@@ -27,6 +27,7 @@ router.get("/:platformId", function (req, res) {
               reasons: faveGame.map((userFave) => userFave.reasons),
             };
           })
+          .slice(0, 5)
           .sort((a, b) => {
             if (a.count > b.count) {
               return -1;
