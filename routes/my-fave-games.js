@@ -57,9 +57,13 @@ router.post("/", jwtCheck, (req, res) => {
               Authorization: req.header("Authorization"),
             },
           }).then((userInfo) => {
+            debug(userInfo);
             User.create({
               userId,
-              name: (userInfo.data && userInfo.data.name) || "",
+              username:
+                (userInfo.data &&
+                  userInfo.data["https://myfavegames/username"]) ||
+                "",
             })
               .then(() => res.status(200).send(newGame))
               .catch((err) => res.status(400).send(err));

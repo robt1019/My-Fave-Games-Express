@@ -40,7 +40,9 @@ router.get("/", (req, res) => {
   } else {
     debug(`search term: ${searchTerm}`);
     const searchTermRegex = new RegExp(searchTerm, "i");
-    User.find({ $or: [{ userId: searchTermRegex }, { name: searchTermRegex }] })
+    User.find({
+      $or: [{ userId: searchTermRegex }, { username: searchTermRegex }],
+    })
       .then((users) => {
         debug(`users found: ${users}`);
         res.status(200).send(users);
