@@ -21,18 +21,14 @@ router.get("/:gameId", (req, res) => {
           Accept: "application/json",
           "user-key": process.env.IGDB_USER_KEY,
         },
-        data: `fields id, url; where game = ${gameId}; limit 100;`,
+        data: `fields id, url; where game = ${gameId}; limit 10;`,
       })
         .then((screenshots) => {
           res.json({
             ...game.data[0],
-            screenshots: screenshots.data.map((screenshot) => ({
-              ...screenshot,
-              url: `https:${screenshot.url.replace(
-                "t_thumb",
-                "t_screenshot_big"
-              )}`,
-            })),
+            screenshot: `https:${screenshots.data[
+              Math.floor(Math.random() * screenshots.data.length - 1)
+            ].url.replace("t_thumb", "t_screenshot_big")}`,
           });
         })
         .catch((err) => res.status(400).send(err));
