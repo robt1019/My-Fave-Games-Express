@@ -13,7 +13,11 @@ router.get("/me", jwtCheck, (req, res) => {
   const userId = sha256(req.user.sub);
   User.findOne({ userId })
     .then((user) => {
-      res.status(200).send(user);
+      if (user) {
+        res.status(200).send(user);
+      } else {
+        res.status(204).send();
+      }
     })
     .catch((err) => res.status(400).send(err));
 });
