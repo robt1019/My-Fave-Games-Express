@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const debug = require("debug")("http");
 
 router.get("/:gameId", (req, res) => {
   const gameId = req.params.gameId;
@@ -31,9 +32,13 @@ router.get("/:gameId", (req, res) => {
           .then((screenshots) => {
             res.json({
               ...game.data[0],
-              screenshot: `https:${screenshots.data[
-                Math.floor(Math.random() * screenshots.data.length - 1)
-              ].url.replace("t_thumb", "t_screenshot_big")}`,
+              screenshots: screenshots.data.map((screenshot) => ({
+                ...screenshot,
+                url: `https:${screenshot.url.replace(
+                  "t_thumb",
+                  "t_screenshot_big"
+                )}`,
+              })),
             });
           })
           .catch((err) => res.status(400).send(err && err.messsage));
@@ -45,27 +50,70 @@ router.get("/:gameId", (req, res) => {
 });
 
 router.get("/", function (req, res) {
-  const { searchTerm, gameIds } = req.query;
-  if (!(searchTerm || gameIds)) {
+  const { search, gameIds } = req.query;
+  debug(`gameIds: ${gameIds}`);
+  if (!(search || gameIds)) {
     res
       .status(400)
       .send(
         "You must provide a search term or game ids list via the search or gameIds query strings"
       );
   } else {
-    axios({
-      url: "https://api-v3.igdb.com/games",
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "user-key": process.env.IGDB_USER_KEY,
-      },
-      data: `fields name, platforms; where id=(${gameIds});${
-        searchTerm ? `search "${searchTerm};"` : ""
-      } limit 100;`,
-    })
-      .then((response) => {
-        res.json(response.data);
+    debug(`I got here at least. That is something. Right?`);
+    Promise.all([
+      axios({
+        url: "https://api-v3.igdb.com/games",
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "user-key": process.env.IGDB_USER_KEY,
+        },
+        data: `fields name, platforms; ${
+          gameIds ? `where id=(${gameIds});` : ""
+        }${search ? `search "${search}";` : ""} limit 100;`,
+      }),
+      new Promise((resolve, reject) => {
+        if (!gameIds) {
+          resolve([]);
+        }
+        axios({
+          url: "https://api-v3.igdb.com/screenshots",
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "user-key": process.env.IGDB_USER_KEY,
+          },
+          data: `fields id, url, game;${
+            gameIds ? `where game=(${gameIds});` : ""
+          }  limit 100;`,
+        })
+          .then((screenshots) => {
+            debug(`screenshots: ${screenshots}`);
+            resolve(
+              screenshots.data.map((screenshot) => ({
+                ...screenshot,
+                url: `https:${screenshot.url.replace(
+                  "t_thumb",
+                  "t_screenshot_big"
+                )}`,
+              }))
+            );
+          })
+          .catch((err) => {
+            debug(`error fetching screenshots: ${err}`);
+            reject(err);
+          });
+      }),
+    ])
+      .then(([games, screenshots]) => {
+        debug(`found games: ${games.data} and screenshots ${screenshots}`);
+        const joined = games.data.map((game) => ({
+          ...game,
+          screenshots: screenshots.filter(
+            (screenshot) => screenshot.game === game.id
+          ),
+        }));
+        res.status(200).json(joined);
       })
       .catch((err) => {
         res.status(400).send(err);

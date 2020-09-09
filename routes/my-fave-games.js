@@ -50,8 +50,10 @@ router.post("/", jwtCheck, (req, res) => {
 
       newGame.save().then(() => {
         User.findOne({ userId })
-          .then((result) => {
-            if (!result) {
+          .then((userFound) => {
+            if (userFound) {
+              res.status(200).send(newGame);
+            } else {
               axios({
                 url: `${process.env.AUTH0_DOMAIN}userInfo`,
                 method: "GET",
