@@ -29,49 +29,53 @@ router.post("/", jwtCheck, (req, res) => {
   const { gameId, platformId, reasons } = req.body;
   const userId = sha256(req.user.sub);
 
-  debug(
-    `creating new game with body: ${JSON.stringify(
-      req.body
-    )}, gameId: ${gameId}, userId: ${userId} and platformId: ${platformId}`
-  );
-
-  const newGame = new FaveGame({
-    id: `${platformId}-${gameId}-${userId}`,
-    platformId,
-    gameId,
-    userId,
-    reasons,
-  });
-
-  newGame
-    .save()
-    .then(() => {
-      User.findOne({ userId }).then((result) => {
-        if (result) {
-          res.status(200).send(newGame);
-        } else {
-          axios({
-            url: `${process.env.AUTH0_DOMAIN}userInfo`,
-            method: "GET",
-            headers: {
-              Authorization: req.header("Authorization"),
-            },
-          }).then((userInfo) => {
-            debug(userInfo);
-            User.create({
-              userId,
-              username:
-                (userInfo.data &&
-                  userInfo.data["https://myfavegames/username"]) ||
-                "",
-            })
-              .then(() => res.status(200).send(newGame))
-              .catch((err) => res.status(400).send(err));
-          });
-        }
+  FaveGame.find({ userId }).then((results) => {
+    if (results && results.length >= 5) {
+      debug(`too many games`);
+      res.status(400).send({ code: "too_many_games" });
+    } else {
+      const newGame = new FaveGame({
+        id: `${platformId}-${gameId}-${userId}`,
+        platformId,
+        gameId,
+        userId,
+        reasons,
       });
-    })
-    .catch((err) => res.status(400).send(err));
+
+      debug(
+        `creating new game with body: ${JSON.stringify(
+          req.body
+        )}, gameId: ${gameId}, userId: ${userId} and platformId: ${platformId}`
+      );
+
+      newGame.save().then(() => {
+        User.findOne({ userId })
+          .then((result) => {
+            if (!result) {
+              axios({
+                url: `${process.env.AUTH0_DOMAIN}userInfo`,
+                method: "GET",
+                headers: {
+                  Authorization: req.header("Authorization"),
+                },
+              }).then((userInfo) => {
+                debug(userInfo);
+                User.create({
+                  userId,
+                  username:
+                    (userInfo.data &&
+                      userInfo.data["https://myfavegames/username"]) ||
+                    "",
+                })
+                  .then(() => res.status(200).send(newGame))
+                  .catch((err) => res.status(400).send(err));
+              });
+            }
+          })
+          .catch((err) => res.status(400).send(err));
+      });
+    }
+  });
 });
 
 router.put("/:faveGameId", jwtCheck, (req, res) => {
