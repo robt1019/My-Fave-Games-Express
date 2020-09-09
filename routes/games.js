@@ -45,11 +45,13 @@ router.get("/:gameId", (req, res) => {
 });
 
 router.get("/", function (req, res) {
-  const searchTerm = req.query.search;
-  if (!searchTerm) {
+  const { searchTerm, gameIds } = req.query;
+  if (!(searchTerm || gameIds)) {
     res
       .status(400)
-      .send("You must provide a search term via the search query string");
+      .send(
+        "You must provide a search term or game ids list via the search or gameIds query strings"
+      );
   } else {
     axios({
       url: "https://api-v3.igdb.com/games",
@@ -58,7 +60,9 @@ router.get("/", function (req, res) {
         Accept: "application/json",
         "user-key": process.env.IGDB_USER_KEY,
       },
-      data: `fields name, platforms; search "${searchTerm}"; limit 100;`,
+      data: `fields name, platforms; where id=(${gameIds});${
+        searchTerm ? `search "${searchTerm};"` : ""
+      } limit 100;`,
     })
       .then((response) => {
         res.json(response.data);
