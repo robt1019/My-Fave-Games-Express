@@ -5,11 +5,12 @@ const debug = require("debug")("http");
 
 router.get("/", function (req, res) {
   const platformIds = req.query.platformIds;
-  if (!platformIds) {
+  const searchTerm = req.query.searchTerm;
+  if (!(platformIds || searchTerm)) {
     res
       .status(400)
       .send(
-        "You must provide a comma separated list of platformIds in the query string"
+        "You must provide a comma separated list of platformIds, or a searchTerm in the query string"
       );
   } else {
     axios({
@@ -19,7 +20,9 @@ router.get("/", function (req, res) {
         Accept: "application/json",
         "user-key": process.env.IGDB_USER_KEY,
       },
-      data: `fields name, platform_logo; where id=(${platformIds}); limit 100;`,
+      data: `fields name, platform_logo; ${
+        platformIds ? `where id=(${platformIds});` : `search "${searchTerm}";`
+      } limit 100;`,
     })
       .then((platforms) => {
         res.status(200).json(platforms.data);
