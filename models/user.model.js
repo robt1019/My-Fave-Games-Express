@@ -10,8 +10,8 @@ const userSchema = new Schema({
   },
   username: {
     type: String,
-    required: false,
-    unique: false,
+    required: true,
+    unique: true,
     trim: true,
   },
 });

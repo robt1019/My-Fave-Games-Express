@@ -4,6 +4,7 @@ const { jwtCheck } = require("../services/jwt-check.service");
 const router = express.Router();
 const debug = require("debug")("http");
 const crypto = require("crypto");
+const axios = require("axios");
 
 function sha256(buffer) {
   return crypto.createHash("sha256").update(buffer, "utf8").digest("hex");
@@ -16,7 +17,24 @@ router.get("/me", jwtCheck, (req, res) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        res.status(204).send();
+        axios({
+          url: `${process.env.AUTH0_DOMAIN}userInfo`,
+          method: "GET",
+          headers: {
+            Authorization: req.header("Authorization"),
+          },
+        })
+          .then((userInfo) => {
+            debug(`found userInfo: ${userInfo}`);
+            User.create({
+              userId,
+              username:
+                userInfo.data && userInfo.data["https://myfavegames/username"],
+            })
+              .then((user) => res.status(200).send(user))
+              .catch((err) => res.status(400).send(err));
+          })
+          .catch((err) => res.status(400).send(err));
       }
     })
     .catch((err) => res.status(400).send(err));

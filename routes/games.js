@@ -106,7 +106,6 @@ router.get("/", function (req, res) {
       }),
     ])
       .then(([games, screenshots]) => {
-        debug(`found games: ${games.data} and screenshots ${screenshots}`);
         const joined = games.data.map((game) => ({
           ...game,
           screenshots: screenshots.filter(
